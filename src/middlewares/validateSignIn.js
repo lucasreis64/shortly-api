@@ -1,21 +1,22 @@
+import { signInSchema } from "../models/signInSchema.js";
 import { connection } from "../db/database.js";
-import { signUpSchema } from "../models/signUpSchema.js";
 import { validateBySchema } from "../services/validateBySchema.js";
 
-export async function validateSignUp(req, res, next) {
+export async function validateSignIn(req, res, next) {
     const { email } = req.body;
-    if (!validateBySchema(req.body, res, signUpSchema)) return;
+    if (!validateBySchema(req.body, res, signInSchema)) return;
+
     try {
-        const isExistentEmail = await connection.query(
+        const user = await connection.query(
             "SELECT * FROM users WHERE email = $1;",
             [email]
         );
-
-        if (isExistentEmail.rows.length > 0) {
-            res.sendStatus(409);
+        
+        if (user.rows.length === 0) {
+            res.sendStatus(401);
             return;
         }
-
+        res.locals.user = user.rows[0]
         next();
     } catch (error) {
         console.error(error);

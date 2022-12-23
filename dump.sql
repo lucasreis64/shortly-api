@@ -25,5 +25,5 @@ CREATE TABLE "sessions" (
 ALTER TABLE users
 ADD "createdAt" TIMESTAMP NOT NULL DEFAULT NOW();
 
-ALTER TABLE users
-DROP createdAt;
+ALTER TABLE links
+ADD "visitCount" INTEGER NOT NULL DEFAULT 0;

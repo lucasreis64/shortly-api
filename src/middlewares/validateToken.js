@@ -1,4 +1,6 @@
-/* export async function validateToken(req, res, next) {
+import { connection } from "../db/database.js";
+
+export async function validateToken(req, res, next) {
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
 
@@ -7,8 +9,24 @@
     }
 
     try {
-        const session = await sessions.findOne({ token: token });
-        const user = await accounts.findOne({ _id: session?.userId });
+        let session = await connection.query(
+            "SELECT * FROM sessions WHERE token = $1;",
+            [token]
+        );
+
+        session = session?.rows[0];
+    
+        if (!session) {
+            res.sendStatus(401);
+            return;
+        }
+        
+        let user = await connection.query(
+            "SELECT * FROM users WHERE id = $1;",
+            [session.userId]
+        )
+
+        user = user?.rows[0];
 
         if(!user){
             res.status(422).send('invalid token')
@@ -17,11 +35,11 @@
 
         delete user.password;
 
-        res.locals.account = user;
+        res.locals.user = user;
+
         next();
     } catch (error) {
         console.error(error);
         res.status(500).send(error);
     }
 }
- */
