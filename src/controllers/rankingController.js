@@ -1,8 +1,6 @@
 import { connection } from "../db/database.js";
 
 export async function rank(req, res) {
-    let { user } = res.locals;
-
     try {
         let ranking = await connection.query(
             `
