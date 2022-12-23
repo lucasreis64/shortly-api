@@ -1,0 +1,29 @@
+
+CREATE TABLE "users" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL UNIQUE,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE "links" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "userId" INTEGER NOT NULL REFERENCES users(id),
+    "url" TEXT NOT NULL,
+    "shortUrl" TEXT NOT NULL,
+    "visitCount" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+
+);
+
+CREATE TABLE "sessions" (
+    "id" SERIAL NOT NULL PRIMARY KEY,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE users
+ADD "createdAt" TIMESTAMP NOT NULL DEFAULT NOW();
+
+ALTER TABLE users
+DROP createdAt;
