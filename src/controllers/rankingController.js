@@ -4,17 +4,18 @@ export async function rank(req, res) {
     let { user } = res.locals;
 
     try {
-        let short = await connection.query(
-            `SELECT u.id, u.name, COUNT(l."shortUrl") AS linksCount, SUM(l."visitCount") AS "visitCount"
-            FROM users u
-            JOIN links l ON l."userId"=u.id
-            GROUP BY u.id
-            ORDER BY "visitCount" ASC`
+        let ranking = await connection.query(
+            `
+            SELECT u.id, u.name, COUNT(l."userId") AS "linksCount", 
+            SUM(COALESCE(l."visitCount", 0)) AS "visitCount" 
+            FROM users u 
+            LEFT JOIN links l ON u.id = l."userId" 
+            GROUP BY u.id, u.name 
+            ORDER BY "visitCount" DESC NULLS LAST LIMIT 10
+        `
         );
 
-        console.log(short.rows)
-
-        res.send(short.rows);
+        res.send(ranking.rows);
     } catch (error) {
         console.error(error);
         res.status(500).send(error);
